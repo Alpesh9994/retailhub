@@ -1,0 +1,74 @@
+:host {
+  display: inline-flex;
+}
+
+.rh-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.2rem 0.6rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.025em;
+  line-height: 1.25;
+  border: 1px solid transparent;
+  transition: all 0.15s ease;
+}
+
+.badge-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* Variants */
+.badge-success {
+  background: rgba(16, 185, 129, 0.12);
+  border-color: rgba(16, 185, 129, 0.28);
+  color: #34d399;
+  .badge-dot {
+    background: #10b981;
+    box-shadow: 0 0 6px #10b981;
+  }
+}
+
+.badge-warning {
+  background: rgba(245, 158, 11, 0.12);
+  border-color: rgba(245, 158, 11, 0.28);
+  color: #fbbf24;
+  .badge-dot {
+    background: #f59e0b;
+    box-shadow: 0 0 6px #f59e0b;
+  }
+}
+
+.badge-danger {
+  background: rgba(239, 68, 68, 0.12);
+  border-color: rgba(239, 68, 68, 0.28);
+  color: #f87171;
+  .badge-dot {
+    background: #ef4444;
+    box-shadow: 0 0 6px #ef4444;
+  }
+}
+
+.badge-info {
+  background: rgba(59, 130, 246, 0.12);
+  border-color: rgba(59, 130, 246, 0.28);
+  color: #60a5fa;
+  .badge-dot {
+    background: #3b82f6;
+    box-shadow: 0 0 6px #3b82f6;
+  }
+}
+
+.badge-neutral {
+  background: rgba(148, 163, 184, 0.12);
+  border-color: rgba(148, 163, 184, 0.2);
+  color: #94a3b8;
+  .badge-dot {
+    background: #64748b;
+  }
+}

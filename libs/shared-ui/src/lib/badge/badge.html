@@ -1,0 +1,8 @@
+<span class="rh-badge" [ngClass]="'badge-' + variant()">
+  @if (dot()) {
+    <span class="badge-dot" aria-hidden="true"></span>
+  }
+  <span class="badge-text">
+    <ng-content></ng-content>
+  </span>
+</span>

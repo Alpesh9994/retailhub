@@ -1,5 +1,11 @@
 {
   "extends": "./tsconfig.app.json",
-  "files": ["src/app/app.ts"],
-  "include": ["src/**/*.d.ts"]
+  "files": [
+    "../../libs/shared-ui/src/public-api.ts",
+    "../../libs/shared-models/src/public-api.ts",
+    "src/app/app.ts"
+  ],
+  "include": [
+    "src/**/*.d.ts"
+  ]
 }

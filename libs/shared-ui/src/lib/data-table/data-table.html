@@ -1,0 +1,58 @@
+<div class="table-container">
+  <table class="rh-table">
+    <thead>
+      <tr>
+        @for (col of columns(); track col.key) {
+          <th
+            [style.width]="col.width || 'auto'"
+            [style.text-align]="col.align || 'left'"
+          >
+            {{ col.label }}
+          </th>
+        }
+      </tr>
+    </thead>
+
+    <tbody>
+      @if (loading()) {
+        <!-- Skeleton Loading Rows -->
+        @for (i of [1, 2, 3, 4, 5]; track i) {
+          <tr class="skeleton-row">
+            @for (col of columns(); track col.key) {
+              <td>
+                <div class="skeleton-bar"></div>
+              </td>
+            }
+          </tr>
+        }
+      } @else if (data().length === 0) {
+        <!-- Empty State Row -->
+        <tr>
+          <td [attr.colspan]="columns().length" class="empty-state-cell">
+            <div class="empty-state">
+              <span class="empty-icon">📂</span>
+              <p class="empty-text">{{ emptyMessage() }}</p>
+            </div>
+          </td>
+        </tr>
+      } @else {
+        <!-- Data Rows -->
+        @for (item of data(); track $index) {
+          @if (rowTemplate()) {
+            <ng-container
+              *ngTemplateOutlet="rowTemplate()!; context: { $implicit: item, index: $index }"
+            />
+          } @else {
+            <tr class="data-row" (click)="onRowClick(item)">
+              @for (col of columns(); track col.key) {
+                <td [style.text-align]="col.align || 'left'">
+                  {{ getCellValue(item, col.key) }}
+                </td>
+              }
+            </tr>
+          }
+        }
+      }
+    </tbody>
+  </table>
+</div>
