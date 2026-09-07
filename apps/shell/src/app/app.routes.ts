@@ -1,23 +1,51 @@
 import { inject, Type } from '@angular/core';
 import { Routes } from '@angular/router';
+import { authGuard, guestGuard } from '@retailhub/shared-auth';
 import { REMOTE_LOADER } from './federation/remote-loader.token';
+import { RemoteFallbackComponent } from './federation/remote-fallback.component';
 
-// A remote's exposed component type can't be statically known by the shell
-// without a shared contract library; Type<unknown> is the closest safe
-// typing Angular itself offers for a dynamically resolved component class.
 type RemoteComponentModule = { App: Type<unknown> };
+
+function loadRemoteSafe(remoteName: string, exposedModule = './Component') {
+  const loader = inject(REMOTE_LOADER);
+  return loader<RemoteComponentModule>(remoteName, exposedModule)
+    .then((m) => m.App)
+    .catch((err) => {
+      console.warn(`[NativeFederation] Remote "${remoteName}" is unreachable:`, err);
+      return RemoteFallbackComponent;
+    });
+}
 
 export const routes: Routes = [
   {
-    path: 'product',
+    path: 'login',
+    canActivate: [guestGuard],
     loadComponent: () =>
-      inject(REMOTE_LOADER)<RemoteComponentModule>('product', './Component').then((m) => m.App),
+      import('./auth/login/login.component').then((m) => m.LoginComponent),
   },
   {
-    path: 'purchasing',
+    path: '',
+    canActivate: [authGuard],
     loadComponent: () =>
-      inject(REMOTE_LOADER)<RemoteComponentModule>('purchasing', './Component').then(
-        (m) => m.App,
-      ),
+      import('./layout/shell-layout.component').then((m) => m.ShellLayoutComponent),
+    children: [
+      {
+        path: '',
+        pathMatch: 'full',
+        redirectTo: 'product',
+      },
+      {
+        path: 'product',
+        loadComponent: () => loadRemoteSafe('product'),
+      },
+      {
+        path: 'purchasing',
+        loadComponent: () => loadRemoteSafe('purchasing'),
+      },
+    ],
+  },
+  {
+    path: '**',
+    redirectTo: '',
   },
 ];

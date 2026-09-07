@@ -467,7 +467,7 @@ main
 
 ## 19. CURRENT PROJECT STATUS
 
-The initial workspace foundation has already been completed.
+Sprint 01 and Sprint 02 are completed.
 
 Completed:
 
@@ -489,10 +489,14 @@ Completed:
 - GitHub repository established
 - initial workspace foundation committed
 - initial workspace foundation pushed to GitHub
+- Native Federation configured (Shell as Host, Product + Purchasing as Remotes)
+- federation.manifest.json created for runtime remote URL resolution
+- REMOTE_LOADER injection token created for safe lazy loading of remotes
+- Shell routes wired to Product (port 4201) and Purchasing (port 4202) remotes
 
-Initial commit:
+Sprint 03 is in progress.
 
-chore: establish Sprint 01 workspace foundation
+Sprint 03 goal: Authentication-first — NestJS backend + JWT auth + Angular login page.
 
 Do not regenerate this workspace.
 
@@ -531,3 +535,98 @@ over:
 complex + over-engineered + speculative
 
 When multiple technically valid solutions exist, recommend the simplest solution that satisfies the current requirements and explain important trade-offs.
+
+---
+
+## 22. BACKEND TECHNOLOGY STACK
+
+RetailHub uses the following approved backend stack:
+
+- **Framework**: NestJS (TypeScript-first, decorator-based, dependency injection — same architectural patterns as Angular)
+- **Database**: PostgreSQL (relational, production-grade)
+- **ORM**: Prisma (TypeScript-first, schema-driven, generates types automatically)
+- **Auth**: Passport.js with Local and JWT strategies
+- **Password hashing**: bcrypt
+- **Validation**: class-validator + class-transformer on DTOs
+
+The backend lives in:
+
+```
+retailhub/
+└── api/          ← NestJS backend (separate package.json)
+```
+
+The `api/` folder has its own `package.json` and `node_modules`.
+
+Angular dependencies (in the root `package.json`) must not be mixed with NestJS dependencies (in `api/package.json`).
+
+The default development port for the NestJS API is `3000`.
+
+Do not use .NET, Python, or Firebase as the backend.
+
+Do not introduce a different ORM without a clear technical justification.
+
+---
+
+## 23. AUTHENTICATION AND TOKEN STRATEGY
+
+RetailHub uses a JWT access token + refresh token strategy.
+
+### Access Token
+
+- Short-lived: 15 minutes
+- Stored **in memory only** (Angular signal in `AuthService`)
+- Never stored in localStorage or sessionStorage
+- Attached to every API request via an Angular HTTP interceptor as `Authorization: Bearer <token>`
+
+### Refresh Token
+
+- Long-lived: 7 days
+- Stored in an **httpOnly, Secure, SameSite=Strict cookie**
+- Never accessible from JavaScript
+- Used only to obtain a new access token via `POST /auth/refresh`
+
+### Token Security Rules
+
+- JWT secrets must be in environment variables — never hard-coded
+- Refresh tokens must be invalidated on logout (server-side tracking or rotation)
+- Passwords must be hashed with bcrypt — never stored in plain text
+- Passwords must never be returned in any API response
+- CORS must be configured to allow only known origins
+- Helmet must be applied in NestJS for security headers
+- Rate limiting must be applied to `/auth/login` and `/auth/refresh`
+
+### Auth Flow
+
+```
+Angular Login Form
+    ↓ POST /auth/login { email, password }
+NestJS AuthController
+    ↓ validates credentials via LocalStrategy
+NestJS AuthService
+    ↓ bcrypt.compare()
+    ↓ returns accessToken + sets httpOnly refresh cookie
+Angular AuthService
+    ↓ stores accessToken in signal (memory)
+    ↓ redirects to Shell layout
+Subsequent requests
+    ↓ HTTP interceptor adds Authorization: Bearer <accessToken>
+    ↓ On 401: POST /auth/refresh → new accessToken
+Logout
+    ↓ POST /auth/logout
+    ↓ Clears httpOnly cookie server-side
+    ↓ Angular clears signal, redirects to /login
+```
+
+### Angular Auth Responsibilities (`shared-auth`)
+
+- `AuthService` — signals for current user and auth state, `login()`, `logout()`, `refresh()` methods
+- `AuthGuard` — redirects unauthenticated users to `/login`
+- `AuthInterceptor` — attaches Bearer token to outgoing HTTP requests
+- `AuthModels` — `LoginRequest`, `LoginResponse`, `AuthUser` interfaces
+
+Authentication is a Shell concern.
+
+Remote MFEs must not implement their own authentication.
+
+Remote MFEs receive the authenticated user context through the Shell's shared auth service.

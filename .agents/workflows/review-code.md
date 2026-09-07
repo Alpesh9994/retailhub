@@ -13,12 +13,13 @@ Review the selected or relevant RetailHub code using the current workspace and a
 3. Understand the purpose and responsibility of the code.
 4. Do not assume missing files, APIs, services, models, or configuration.
 5. Do not modify files during the review.
+6. When reviewing backend code, inspect `api/` alongside the Angular code.
 
 ## Review Areas
 
 ### Architecture
 
-Check:
+Check Angular/MFE:
 
 - correct Shell/Remote responsibilities
 - proper MFE boundaries
@@ -26,6 +27,15 @@ Check:
 - appropriate shared-library usage
 - no unnecessary coupling
 - no unnecessary abstraction or overengineering
+
+Check Backend (when api/ exists):
+
+- NestJS module boundaries respected (AuthModule, UsersModule, etc. are cohesive)
+- Controllers are thin — no business logic in controllers
+- Services own business logic
+- Prisma access only through dedicated service or repository
+- No domain logic leaked into Angular from NestJS or vice versa
+- API contracts match what Angular `shared-auth` / `shared-api` expects
 
 ### Angular
 
@@ -41,11 +51,34 @@ Check:
 - appropriate component design
 - appropriate service responsibilities
 
+### NestJS
+
+Check:
+
+- modules are cohesive and do not exceed their responsibility
+- controllers are thin (delegate to services)
+- services contain business logic, not controllers
+- DTOs use class-validator decorators
+- guards are applied at the correct level (controller or route)
+- Prisma queries are in appropriate service, not scattered
+- no raw SQL unless Prisma is insufficient
+- environment variables accessed via ConfigService, not process.env directly
+
+### Prisma Schema
+
+When reviewing schema changes:
+
+- field types are appropriate
+- relations are correctly defined
+- indexes exist for frequently queried fields
+- migration files exist for every schema change
+- no breaking migrations without a migration plan
+
 ### TypeScript
 
 Check:
 
-- strict typing
+- strict typing (both Angular and NestJS)
 - interfaces/types
 - unnecessary `any`
 - unsafe type assertions
@@ -56,15 +89,21 @@ Check:
 
 Check that responsibility follows the preferred pattern:
 
-Component
-↓
-Feature/Application Service
-↓
-API Service
-↓
-HttpClient
-↓
-Backend API
+```
+Angular Component
+    ↓
+Angular Feature Service
+    ↓
+Angular API Service (HttpClient)
+    ↓
+NestJS Controller
+    ↓
+NestJS Service
+    ↓
+Prisma
+    ↓
+PostgreSQL
+```
 
 Identify business or API logic incorrectly placed in components.
 
@@ -75,11 +114,17 @@ Check:
 - authentication/session handling
 - authorization assumptions
 - unsafe input handling
-- XSS risks
+- XSS risks (Angular)
 - sensitive data exposure
-- hard-coded secrets
-- unsafe token handling
+- hard-coded secrets (Angular and NestJS)
+- unsafe token handling (access token in memory, refresh token in httpOnly cookie)
 - insecure API usage
+- JWT secret not exposed in frontend code
+- CORS configured to allowed origins only
+- Helmet used in NestJS for security headers
+- Rate limiting on auth endpoints
+- Passwords never returned in API responses
+- Prisma queries not vulnerable to injection (Prisma parameterises by default)
 
 ### Performance
 

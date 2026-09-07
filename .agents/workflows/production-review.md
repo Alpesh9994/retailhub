@@ -12,7 +12,7 @@ Do not modify files during the review.
 
 ### Architecture
 
-Check:
+Check Angular/MFE:
 
 - Shell/Remote boundaries
 - MFE independence
@@ -22,19 +22,38 @@ Check:
 - maintainability
 - architectural consistency
 
+Check Backend (when api/ exists):
+
+- NestJS module boundaries
+- Controller / Service / Prisma layering
+- no business logic in controllers
+- API contracts match what Angular expects
+- no circular dependencies
+
 ### Security
 
-Check:
+Check Angular:
 
-- authentication
-- authorization assumptions
-- token/session handling
-- secrets
-- environment configuration
+- authentication handled by Shell via `shared-auth`
+- no tokens in localStorage
+- access token stored only in memory (Angular signal)
+- HTTP interceptor attaches Bearer token
+- no hard-coded secrets or API keys
 - XSS risks
-- CSRF considerations
-- API security assumptions
-- sensitive information exposure
+
+Check Backend:
+
+- JWT secrets stored in environment variables, not source code
+- Refresh token stored in httpOnly, Secure, SameSite cookie
+- CORS restricted to known origins
+- Helmet middleware applied
+- Rate limiting on `/auth/login` and `/auth/refresh`
+- Passwords hashed with bcrypt
+- Passwords never returned in API responses
+- Input validated with class-validator DTOs
+- Prisma parameterises queries (no SQL injection)
+- `.env` file not committed to Git
+- `.env.example` committed with placeholder values
 
 ### Performance
 

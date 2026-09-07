@@ -1,0 +1,80 @@
+<div class="shell-container">
+  <!-- Top Navigation Header -->
+  <header class="shell-header">
+    <div class="header-left">
+      <div class="brand">
+        <span class="brand-badge">⚡</span>
+        <span class="brand-title">RetailHub</span>
+        <span class="brand-env">Enterprise</span>
+      </div>
+    </div>
+
+    <div class="header-right">
+      @if (authService.currentUser(); as user) {
+        <div class="user-profile">
+          <div class="user-avatar" aria-hidden="true">
+            {{ user.firstName[0] || 'U' }}{{ user.lastName[0] || '' }}
+          </div>
+          <div class="user-details">
+            <span class="user-name">{{ user.firstName }} {{ user.lastName }}</span>
+            <span class="user-role">{{ user.role | uppercase }}</span>
+          </div>
+        </div>
+
+        <button
+          type="button"
+          class="btn-logout"
+          (click)="onLogout()"
+          [disabled]="authService.isLoading()"
+          title="Sign out of RetailHub"
+        >
+          <svg class="logout-icon" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+            <path fill-rule="evenodd" d="M3 4.25A2.25 2.25 0 015.25 2h5.5A2.25 2.25 0 0113 4.25v2a.75.75 0 01-1.5 0v-2a.75.75 0 00-.75-.75h-5.5a.75.75 0 00-.75.75v11.5c0 .414.336.75.75.75h5.5a.75.75 0 00.75-.75v-2a.75.75 0 011.5 0v2A2.25 2.25 0 0110.75 18h-5.5A2.25 2.25 0 013 15.75V4.25z" clip-rule="evenodd" />
+            <path fill-rule="evenodd" d="M19 10a.75.75 0 00-.75-.75H8.704l2.48-2.48a.75.75 0 10-1.06-1.06l-3.75 3.75a.75.75 0 000 1.06l3.75 3.75a.75.75 0 101.06-1.06l-2.48-2.48H18.25A.75.75 0 0019 10z" clip-rule="evenodd" />
+          </svg>
+          <span>Sign out</span>
+        </button>
+      }
+    </div>
+  </header>
+
+  <!-- Body with Sidebar and Main Content -->
+  <div class="shell-body">
+    <aside class="shell-sidebar">
+      <nav class="nav-menu">
+        <div class="nav-section-title">Micro-Frontends</div>
+
+        <a
+          routerLink="/product"
+          routerLinkActive="active"
+          class="nav-item"
+        >
+          <span class="nav-icon">📦</span>
+          <span class="nav-label">Products</span>
+          <span class="mfe-tag">Remote 4201</span>
+        </a>
+
+        <a
+          routerLink="/purchasing"
+          routerLinkActive="active"
+          class="nav-item"
+        >
+          <span class="nav-icon">🛒</span>
+          <span class="nav-label">Purchasing</span>
+          <span class="mfe-tag">Remote 4202</span>
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="system-status">
+          <span class="status-indicator"></span>
+          <span>Federation Active</span>
+        </div>
+      </div>
+    </aside>
+
+    <main class="shell-content">
+      <router-outlet></router-outlet>
+    </main>
+  </div>
+</div>

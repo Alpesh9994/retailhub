@@ -20,9 +20,13 @@ Identify the sprint number and goal when available.
 
 List the features, configuration, applications, libraries, and fixes actually completed.
 
+Separate Angular work from backend (NestJS/Prisma) work when both exist.
+
 ### Architecture Decisions
 
 List important architecture decisions made during the sprint.
+
+Include backend decisions (API design, auth strategy, DB schema choices) when relevant.
 
 ### Files Changed
 
@@ -32,21 +36,37 @@ List:
 - modified files
 - deleted files, if any
 
-Group them logically.
+Group them logically:
+- Angular apps (`apps/`)
+- Angular libs (`libs/`)
+- Backend (`api/`)
+- Configuration / documentation
 
 ### Dependencies
 
 List packages added, removed, or changed and explain why.
 
+Separate Angular dependencies from NestJS/backend dependencies.
+
+### Prisma
+
+When backend work occurred:
+
+- list schema changes
+- list migrations created
+- note current migration status
+
 ### Validation
 
 Include:
 
-- build results
+- Angular build results
+- NestJS build results (when applicable)
 - test results
 - type-check results
 - lint/format results where applicable
 - MFE validation
+- API endpoint validation
 
 ### Known Issues
 

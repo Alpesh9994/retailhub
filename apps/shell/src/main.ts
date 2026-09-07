@@ -1,3 +1,6 @@
+// Ensure Angular dev mode global is defined before remote federated modules load
+(globalThis as unknown as { ngDevMode: boolean }).ngDevMode = true;
+
 import { initFederation } from '@angular-architects/native-federation';
 
 // Remote URLs are resolved at runtime from federation.manifest.json
@@ -7,6 +10,6 @@ import { initFederation } from '@angular-architects/native-federation';
 initFederation('federation.manifest.json', {
   hostRemoteEntry: { url: './remoteEntry.json' },
 })
-  .catch((err) => console.error(err))
-  .then((result) => import('./bootstrap').then((m) => m.bootstrap(result?.loadRemoteModule)))
+  .then((result) => import('./bootstrap').then((m) => m.bootstrap(result.loadRemoteModule)))
   .catch((err) => console.error(err));
+

@@ -1,5 +1,9 @@
 {
   "extends": "./tsconfig.app.json",
-  "files": ["src/main.ts"],
-  "include": ["src/**/*.d.ts"]
+  "files": [
+    "../../libs/shared-auth/src/public-api.ts"
+  ],
+  "include": [
+    "src/**/*.d.ts"
+  ]
 }
